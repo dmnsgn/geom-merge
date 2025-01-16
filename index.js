@@ -156,7 +156,10 @@ function merge(geometries) {
             values,
           );
         } else {
-          mergedGeometry[attribute] = mergedGeometry[attribute].concat(values);
+          mergedGeometry[attribute] = mergedGeometry[attribute].concat(
+            // Cast values so concat works with typed arrays if first attribute is Array
+            Array.isArray(values) ? values : Array.from(values),
+          );
         }
       }
     }
