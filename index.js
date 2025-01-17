@@ -32,12 +32,11 @@ function chunkAndOffset(array, stride, offset) {
   return result;
 }
 
-const meta = Symbol("geom-merge-meta");
-
 function merge(geometries) {
   let mergedPositionCount = 0;
   let areAllCellsFlatArray = true;
   let areAllCellsTypedArray = true;
+  const meta = new Array(geometries.length);
 
   // Set mergeable attributes from first geometry
   const initialAttributes = getGeometryAttributes(geometries[0]);
@@ -83,7 +82,7 @@ function merge(geometries) {
     const isCellsFlatArray = isAttributeFlat(geometry.cells);
 
     // Store attribute properties reused in the next loop
-    geometry[meta] = { positionCount, isCellsFlatArray };
+    meta[i] = { positionCount, isCellsFlatArray };
 
     // Increment/update properties used to determine cells type
     mergedPositionCount += positionCount;
@@ -112,7 +111,7 @@ function merge(geometries) {
   for (let i = 0; i < geometries.length; i++) {
     const geometry = geometries[i];
 
-    const { positionCount, isCellsFlatArray } = geometry[meta];
+    const { positionCount, isCellsFlatArray } = meta[i];
 
     for (let j = 0; j < mergeableAttributes.length; j++) {
       const attribute = mergeableAttributes[j];
@@ -165,8 +164,6 @@ function merge(geometries) {
     }
 
     vertexOffset += positionCount;
-
-    delete geometry[meta];
   }
 
   return mergedGeometry;
